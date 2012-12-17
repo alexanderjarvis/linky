@@ -30,14 +30,24 @@ object Application extends Controller with MongoController {
       urlForm.bindFromRequest.fold(
         errors => Future(BadRequest(views.html.index(errors))),
         urlForm => {
-          Base62Code.generate(unique).flatMap { code =>
-            val json = Json.obj(
-              "url" -> urlForm,
-              "code" -> code
-            )
-            collection.insert[JsValue](json).map { _ =>
-              Ok(views.html.created(code))
-            }.recover { case _ => InternalServerError }
+          val longUrl = urlForm.stripPrefix("http://").stripPrefix("https://")
+          val qb = QueryBuilder().query(Json.obj("url" -> longUrl))
+          collection.find[JsValue](qb).headOption.flatMap { link =>
+            link match {
+              case Some(link) => Future(Ok(views.html.created((link \ "code").as[String])))
+              case None => {
+                Base62Code.generate(unique).flatMap { code =>
+                  val json = Json.obj(
+                    "url" -> longUrl,
+                    "code" -> code,
+                    "count" -> 0
+                  )
+                  collection.insert[JsValue](json).map { _ =>
+                    Ok(views.html.created(code))
+                  }.recover { case _ => InternalServerError }
+                }
+              }
+            }
           }
         }
       )
@@ -51,10 +61,15 @@ object Application extends Controller with MongoController {
   def redirect(code: String) = Action {
     Async {
       val qb = QueryBuilder().query(Json.obj("code" -> code))
-      collection.find[JsValue](qb).headOption.map { link =>
+      collection.find[JsValue](qb).headOption.flatMap { link =>
         link match {
-          case Some(link) => MovedPermanently((link \ "url").as[String])
-          case None => NotFound
+          case Some(link) => {
+            collection.update(Json.obj("code" -> code), Json.obj("$inc" -> Json.obj("count" -> 1))).map { _ =>
+              val longUrl = "http://" + (link \ "url").as[String]
+              MovedPermanently(longUrl)
+            }
+          }
+          case None => Future(NotFound)
         }
       }
     }
