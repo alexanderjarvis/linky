@@ -34,7 +34,12 @@ object Application extends Controller with MongoController {
           val qb = QueryBuilder().query(Json.obj("url" -> longUrl))
           collection.find[JsValue](qb).headOption.flatMap { link =>
             link match {
-              case Some(link) => Future(Ok(views.html.created((link \ "code").as[String])))
+              case Some(link) => {
+                val url = "http://" + (link \ "url").as[String]
+                val code = (link \ "code").as[String]
+                val count = (link \ "count").as[Long]
+                Future(Ok(views.html.created(url, code, count)))
+              }
               case None => {
                 Base62Code.generate(unique).flatMap { code =>
                   val json = Json.obj(
@@ -43,7 +48,7 @@ object Application extends Controller with MongoController {
                     "count" -> 0
                   )
                   collection.insert[JsValue](json).map { _ =>
-                    Ok(views.html.created(code))
+                    Ok(views.html.created(longUrl, code, 0))
                   }.recover { case _ => InternalServerError }
                 }
               }

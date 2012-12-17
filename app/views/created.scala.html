@@ -1,7 +1,10 @@
-@(code: String)(implicit request: RequestHeader)
+@(url: String, code: String, count: Long)(implicit request: RequestHeader)
 
 @main("Your link") {
 
     <input type="text" value="@("http://" + request.host + "/" + code )" onclick="this.select();" readonly="readonly" />
+
+    <p><a href="@url">@url</a></p>
+    <p>clicks: @count</p>
 
 }
