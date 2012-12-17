@@ -13,3 +13,6 @@ dist
 /.project
 /RUNNING_PID
 /.settings
+.ensime
+.ensime_lucene
+.DS_Store

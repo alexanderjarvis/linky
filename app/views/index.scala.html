@@ -1,7 +1,20 @@
-@(message: String)
+@(urlForm: Form[String])
 
-@main("Welcome to Play 2.0") {
-    
-    @play20.welcome(message)
-    
+@import helper._
+@import helper.twitterBootstrap._
+
+@main("Linky") {
+
+    @helper.form(action = routes.Application.create, 'class -> "form-inline") {
+
+        @inputText(
+            urlForm("url"),
+            '_label -> "URL",
+            '_help -> "",
+            'placeholder -> "enter your url"
+        )
+
+        <input type="submit" class="btn btn-primary" value="Create Link" />
+    }
+
 }

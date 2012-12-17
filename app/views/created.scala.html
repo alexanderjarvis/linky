@@ -1,0 +1,7 @@
+@(code: String)(implicit request: RequestHeader)
+
+@main("Your link") {
+
+    <input type="text" value="@("http://" + request.host + "/" + code )" onclick="this.select();" readonly="readonly" />
+
+}
