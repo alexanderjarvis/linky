@@ -5,7 +5,7 @@ Linky is a quick and dirty URL shortener, written using [Play](http://playframew
 
 ## Why?
 
-Because when you have a custom domain e.g. [http://pan.ax/]() and wish to use it to redirect URLs like [http://bit.ly]() or [http://goo.gl]() but don't think [$995/month](http://www.enterprise.bitly.com/) is a reasonable price for such a service.
+Because when you have a custom domain e.g. [pan.ax](http://pan.ax/) and wish to use it to redirect URLs like [bit.ly](http://bit.ly/) or [goo.gl](http://goo.gl/) but don't think [$995/month](http://www.enterprise.bitly.com/) is a reasonable price for such a service.
 
 Especially when it only takes a couple of hours to make a working prototype..
 
