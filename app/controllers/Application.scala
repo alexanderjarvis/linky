@@ -71,7 +71,7 @@ object Application extends Controller with MongoController {
           case Some(link) => {
             collection.update(Json.obj("code" -> code), Json.obj("$inc" -> Json.obj("count" -> 1))).map { _ =>
               val longUrl = "http://" + (link \ "url").as[String]
-              MovedPermanently(longUrl)
+              MovedPermanently(longUrl).withHeaders((CACHE_CONTROL, "no-store"), (PRAGMA, "no-cache"))
             }
           }
           case None => Future(NotFound)
